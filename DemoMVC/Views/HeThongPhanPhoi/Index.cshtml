@@ -1,0 +1,38 @@
+@model IEnumerable<DemoMVC.Models.HeThongPhanPhoi>
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>Index</h1>
+<div>
+    <a asp-action="Create">Create New</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MaHTPP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TenHTPP)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaHTPP)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TenHTPP)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.MaHTPP">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.MaHTPP">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

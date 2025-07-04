@@ -7,5 +7,6 @@ namespace DemoMVC.Models
         public required string DiaChi { get; set; }
         public required string NguoiDaiDien { get; set; }
         public required string DienThoai { get; set; }
+        public required HeThongPhanPhoi HeThongPhanPhoi { get; set; }
     }
 }

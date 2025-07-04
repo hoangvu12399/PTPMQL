@@ -1,0 +1,44 @@
+@model IEnumerable<DemoMVC.Models.Daily>
+@{
+    ViewData["Title"] = "Daily List";
+}
+<h1>Daily List</h1>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.First().MaDaily)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().TenDaily)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaDaily)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TenDaily)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaHTPP)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.MaDaily" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.MaDaily" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
