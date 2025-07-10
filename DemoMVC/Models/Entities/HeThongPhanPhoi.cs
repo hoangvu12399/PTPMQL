@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DemoMVC.Models
+namespace DemoMVC.Models.Entities
 {
     [Table("HeThongPhanPhoi")]
     public class HeThongPhanPhoi

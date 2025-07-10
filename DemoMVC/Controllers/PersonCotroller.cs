@@ -1,61 +1,65 @@
 using DemoMVC.Data;
-using DemoMVC.Models;
+using DemoMVC.Models.Entities;
+using DemoMVC.Models.Process;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 
 namespace DemoMVC.Controllers
 {
     public class PersonController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly AutoGenerateCode _autoGenerateCode;
-        
+
         public PersonController(ApplicationDbContext context)
         {
             _context = context;
-            _autoGenerateCode = new AutoGenerateCode();
         }
         public async Task<IActionResult> Index()
         {
-            var lastperson = await _context.Person.OrderByDescending(p => p.PersonId).FirstOrDefaultAsync();
-            if (lastperson != null)
+            return View(await _context.Person.ToListAsync());
+        }
+        public async Task<IActionResult> Detail(string id)
+        {
+            if (id == null)
             {
-                // If there is a last person, generate the next PersonId based on the last one
-                _autoGenerateCode.SetNextIndex(lastperson.PersonId);
+                return NotFound();
             }
-            else
+            var person = await _context.Person
+            .FirstOrDefaultAsync(m => m.PersonId == id);
+            if (person == null)
             {
-                // If no persons exist, start from the first index
-                _autoGenerateCode.SetNextIndex("PS000");
+                return NotFound();
             }
-            var model = await _context.Person.ToListAsync();
-            return View(model);
+            return View(person);
         }
         public IActionResult Create()
         {
-            // Generate a new PersonId using the AutoGenerateCode class
-            var newPersonId = _autoGenerateCode.GenerateCode();
-            ViewBag.NewPersonId = newPersonId;
-            return View();
+            AutoGenerateCode autoGenerateCode = new AutoGenerateCode();
+            // Generate a new PersonId
+            var Person = _context.Person.OrderByDescending(p => p.PersonId).FirstOrDefault();
+            var PersonId = Person == null ? "PS000" : Person.PersonId;
+            var newPersonId = autoGenerateCode.GenerateId(PersonId);
+            var newPerson = new Person
+            {
+                PersonId = newPersonId,
+                FullName = string.Empty,
+                Address = string.Empty,
+                Email = string.Empty
+            };
+            return View(newPerson);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PersonId,FullName,Address")] Person person)
         {
-            var newPersonId = _autoGenerateCode.GenerateCode();
-            person.PersonId = newPersonId; // Assign the generated PersonId to the person object
-            // Ensure the PersonId is set before saving
-            if (person.PersonId == null)
-            {
-                person.PersonId = newPersonId; // Assign the generated PersonId if not set
-            }
-            // Validate the model state
-            if (!ModelState.IsValid)
-            {
-                ModelState.AddModelError("PersonId", "PersonId is required.");
-            }
             if (ModelState.IsValid)
             {
+                // Generate a new PersonId
                 _context.Add(person);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -64,7 +68,7 @@ namespace DemoMVC.Controllers
         }
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.Person == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -112,7 +116,8 @@ namespace DemoMVC.Controllers
             {
                 return NotFound();
             }
-            var person = await _context.Person.FindAsync(id);
+            var person = await _context.Person
+                .FirstOrDefaultAsync(m => m.PersonId == id);
             if (person == null)
             {
                 return NotFound();
@@ -123,10 +128,6 @@ namespace DemoMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.Person == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.Person'  is null.");
-            }
             var person = await _context.Person.FindAsync(id);
             if (person != null)
             {

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using DemoMVC.Models;
+using DemoMVC.Models.Entities;
 using DemoMVC.Controllers;
 
 namespace DemoMVC.Data

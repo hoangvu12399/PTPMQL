@@ -1,4 +1,4 @@
-@model IEnumerable<DemoMVC.Models.Person>
+@model IEnumerable<DemoMVC.Models.Entities.Person>
 @{
     ViewData["Title"] = "Person Page";
 }
@@ -34,7 +34,8 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.PersonId">Edit</a> |
+                    <a asp-action="Edit" asp-route-id="@item.PersonId">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.PersonId">Details</a>
                     <a asp-action="Delete" asp-route-id="@item.PersonId">Delete</a>
                 </td>
             </tr>

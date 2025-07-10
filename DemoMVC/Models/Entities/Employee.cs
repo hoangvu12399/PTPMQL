@@ -1,4 +1,4 @@
-namespace DemoMVC.Models
+namespace DemoMVC.Models.Entities
 {
     public class Employee : Person
     {
