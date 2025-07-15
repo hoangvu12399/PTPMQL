@@ -1,23 +1,21 @@
+using System.Data;
 using DemoMVC.Data;
 using DemoMVC.Models.Entities;
 using DemoMVC.Models.Process;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
 
 namespace DemoMVC.Controllers
 {
     public class PersonController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ExcelProcess _excelProcess;
 
         public PersonController(ApplicationDbContext context)
         {
             _context = context;
+            _excelProcess = new ExcelProcess();
         }
         public async Task<IActionResult> Index()
         {
@@ -51,10 +49,55 @@ namespace DemoMVC.Controllers
                 Address = string.Empty,
                 Email = string.Empty
             };
-            return View(newPerson);
+            return View(Person);
+        }
+        public IActionResult Uploads()
+        {
+            return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Uploads(IFormFile file)
+        {
+            if (file != null)
+            {
+                string fileExtension = Path.GetExtension(file.FileName);
+                if (fileExtension != ".xls" && fileExtension != ".xlsx")
+                {
+                    ModelState.AddModelError("File", "Please upload a valid Excel file.");
+                    // Process the uploaded file
+                }
+                else
+                {
+                    var fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + fileExtension;
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory() + "/Uploads/Excels", fileName);
+                    var filelocation = new FileInfo(filePath).ToString();
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                        var dt = _excelProcess.ExcelToDataTable(filelocation);
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            var ps = new Person
+                            {
+                                PersonId = dt.Rows[i][0].ToString(),
+                                FullName = dt.Rows[i][1].ToString(),
+                                Address = dt.Rows[i][2].ToString(),
+                                Email = dt.Rows[i][3].ToString(),
+                            };
+                            _context.Add(ps);
+                        }
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        
         public async Task<IActionResult> Create([Bind("PersonId,FullName,Address")] Person person)
         {
             if (ModelState.IsValid)
