@@ -36,5 +36,10 @@ namespace DemoMVC.Models.Process
             //STD009
             return prefix + newNumberPart;
         }
+
+        internal string GeneratePersonId()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

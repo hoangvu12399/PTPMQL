@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using DemoMVC.Models.Entities;
 using DemoMVC.Data;
-using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 namespace DemoMVC.Controllers;

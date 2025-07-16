@@ -1,10 +1,13 @@
 @model IEnumerable<DemoMVC.Models.Entities.Person>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
 @{
     ViewData["Title"] = "Person Page";
 }
 <h1>Index</h1>
 <p>
     <a asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Download">Download</a>
 </p>
 <table class="table">
     <thead>
@@ -41,3 +44,25 @@
         }
     </tbody>
 </table>
+
+@using (Html.BeginForm("Index", "Person", FormMethod.Get, new{id ="forml"}))
+{
+    <div class="row">
+        <div class="col-md-11">
+            @Html.PagedListPager((IPagedList) Model, page => Url.Action("Index", new {page = page,pageSize = ViewBag.PageSize}), 
+            new X.PagedList.Mvc.Core.PagedListRenderOptions { LiElementClasses = new string[] {"page-item"}, 
+            PageClasses = new string[] { "page-link" }})
+        </div>
+        <div class=" col-md-1">
+            @Html.DropDownList("PageSize", null ,new { @class = "form-select" })
+        </div>
+    </div>
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#PageSize').change(function () {
+            $('#forml').submit();
+        });
+    });
+</script>

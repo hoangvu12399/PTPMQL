@@ -3,7 +3,10 @@ using DemoMVC.Data;
 using DemoMVC.Models.Entities;
 using DemoMVC.Models.Process;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using X.PagedList.Extensions;
 
 namespace DemoMVC.Controllers
 {
@@ -11,15 +14,29 @@ namespace DemoMVC.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ExcelProcess _excelProcess;
+        private readonly AutoGenerateCode _autoGenerateCode;
+        public async Task<IActionResult> Index(int? page, int? PageSize)
+        {
+            ViewBag.PageSize = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "3", Value = "3" },
+                new SelectListItem { Text = "5", Value = "5" },
+                new SelectListItem { Text = "10", Value = "10" },
+                new SelectListItem { Text = "15", Value = "15" },
+                new SelectListItem { Text = "25", Value = "25" },
+                new SelectListItem { Text = "50", Value = "50" }
+            };
+            int pageSize = (PageSize ?? 3);
+            ViewBag.psize = pageSize;
+            var model = _context.Person.ToList().ToPagedList(page ?? 1, pageSize);
+            return View(model);
+        }
 
         public PersonController(ApplicationDbContext context)
         {
             _context = context;
             _excelProcess = new ExcelProcess();
-        }
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Person.ToListAsync());
+            _autoGenerateCode = new AutoGenerateCode();
         }
         public async Task<IActionResult> Detail(string id)
         {
@@ -49,7 +66,7 @@ namespace DemoMVC.Controllers
                 Address = string.Empty,
                 Email = string.Empty
             };
-            return View(Person);
+            return View(newPerson);
         }
         public IActionResult Uploads()
         {
@@ -97,7 +114,6 @@ namespace DemoMVC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
         public async Task<IActionResult> Create([Bind("PersonId,FullName,Address")] Person person)
         {
             if (ModelState.IsValid)
@@ -121,6 +137,23 @@ namespace DemoMVC.Controllers
                 return NotFound();
             }
             return View(person);
+        }
+        public IActionResult Download()
+        {
+            var fileName = "Your FileName" + ".xlsx";
+            using(ExcelPackage excelPackage = new ExcelPackage())
+            {
+                var workSheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
+                workSheet.Cells["A1"].Value = "PersonId";
+                workSheet.Cells["B1"].Value = "FullName";
+                workSheet.Cells["C1"].Value = "Address";
+
+                var personList = _context.Person.ToList();
+                workSheet.Cells["A2"].LoadFromCollection(personList);
+                var stream = new MemoryStream(excelPackage.GetAsByteArray());
+
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
         }
         [HttpPost]
         [ValidateAntiForgeryToken]

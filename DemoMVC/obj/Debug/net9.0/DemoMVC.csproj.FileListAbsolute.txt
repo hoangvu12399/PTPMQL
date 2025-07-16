@@ -372,3 +372,6 @@ D:\BT\PTPMQL\DemoMVC\bin\Debug\net9.0\System.Xml.XPath.XmlDocument.dll
 D:\BT\PTPMQL\DemoMVC\bin\Debug\net9.0\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
 D:\BT\PTPMQL\DemoMVC\bin\Debug\net9.0\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
 D:\BT\PTPMQL\DemoMVC\bin\Debug\net9.0\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+D:\BT\PTPMQL\DemoMVC\bin\Debug\net9.0\X.PagedList.dll
+D:\BT\PTPMQL\DemoMVC\bin\Debug\net9.0\X.PagedList.Mvc.Core.dll
+D:\BT\PTPMQL\DemoMVC\obj\Debug\net9.0\DemoMVC.MvcApplicationPartsAssemblyInfo.cs
